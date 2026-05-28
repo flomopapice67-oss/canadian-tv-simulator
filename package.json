@@ -1,0 +1,20 @@
+{
+  "name": "canadian-tv-simulator",
+  "version": "1.0.0",
+  "description": "A nostalgic Canadian TV simulator from the 2010s/2011 era",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": ["canada", "tv", "simulator", "2011", "nostalgia"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}

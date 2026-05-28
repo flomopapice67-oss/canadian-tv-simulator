@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canadian TV Simulator 2011</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="tv-container">
+        <!-- TV Set Bezel -->
+        <div class="tv-set">
+            <!-- Screen -->
+            <div class="screen">
+                <div class="screen-inner">
+                    <div class="broadcast-content">
+                        <div class="channel-header">
+                            <div class="channel-logo" id="channelLogo">CTV</div>
+                            <div class="broadcast-info">
+                                <div class="program-title" id="programTitle">Loading...</div>
+                                <div class="program-details" id="programDetails">Stand by...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="main-content" id="mainContent">
+                            <div class="program-display">
+                                <div class="frame-count">00:00:00:00</div>
+                                <div class="test-pattern">
+                                    <div class="test-circle"></div>
+                                    <div class="test-grid"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="broadcast-ticker">
+                            <span id="broadcastTime">00:00</span> - <span id="currentProgram">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Commercial Break Overlay -->
+                    <div class="commercial-overlay" id="commercialOverlay" style="display:none;">
+                        <div class="commercial-content">
+                            <div class="ad-badge">ADVERTISEMENT</div>
+                            <div class="commercial-title" id="commercialTitle">Tim Hortons</div>
+                            <div class="commercial-visual">
+                                <div class="maple-leaf">🍁</div>
+                            </div>
+                            <div class="counter" id="adCounter">30</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Screen Scanlines -->
+                <div class="scanlines"></div>
+                <!-- Screen Glare -->
+                <div class="glare"></div>
+            </div>
+            
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="channel-display" id="channelDisplay">
+                    <span id="channelNumber">1</span>
+                </div>
+                
+                <div class="button-grid">
+                    <button class="remote-btn" onclick="previousChannel()">◀</button>
+                    <button class="remote-btn" onclick="togglePower()">PWR</button>
+                    <button class="remote-btn" onclick="nextChannel()">▶</button>
+                </div>
+                
+                <div class="power-light" id="powerLight" style="background: #00ff00;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Program Guide -->
+    <div class="guide-panel">
+        <h2>📺 Channel Guide</h2>
+        <div class="channel-list" id="channelList">
+            <!-- Channels will be loaded here -->
+        </div>
+    </div>
+    
+    <!-- Schedule Info -->
+    <div class="schedule-panel">
+        <h2>📅 Today's Schedule</h2>
+        <div class="schedule-content" id="scheduleContent">
+            <!-- Schedule will be loaded here -->
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
