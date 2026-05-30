@@ -1,0 +1,11 @@
+# Canadian TV Simulator - Requirements
+# This project uses only Python standard library modules
+# No external dependencies required!
+
+# Python Version: 3.6+
+
+# Standard Library Modules Used:
+# - random (standard library)
+# - time (standard library)
+# - datetime (standard library)
+# - enum (standard library)
