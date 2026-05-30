@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canadian TV Simulator - 2011</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border-bottom: 3px solid #ff0000;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .tv-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 15px solid #333;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+            margin-bottom: 30px;
+        }
+
+        .screen {
+            background: #000;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen.off {
+            background: linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%, #1a1a1a),
+                        linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%, #1a1a1a);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            background-color: #0a0a0a;
+        }
+
+        .screen-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 40, 0.8));
+        }
+
+        .screen-content.commercial {
+            background: linear-gradient(135deg, #ff6b00, #ff8c00);
+            animation: commercial-flash 0.5s infinite alternate;
+        }
+
+        @keyframes commercial-flash {
+            from { opacity: 0.9; }
+            to { opacity: 1; }
+        }
+
+        .power-indicator {
+            width: 20px;
+            height: 20px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        .power-indicator.off {
+            background: #333;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .program-info {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .program-name {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #fff;
+        }
+
+        .program-details {
+            font-size: 0.9em;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .channel-name {
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            margin: 5px 0;
+            font-weight: bold;
+        }
+
+        .no-signal {
+            font-size: 3em;
+            color: #ff0000;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .controls {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #ff3333, #ff0000);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #333, #555);
+            box-shadow: 0 4px 15px rgba(100, 100, 100, 0.3);
+        }
+
+        button.secondary:hover {
+            background: linear-gradient(135deg, #555, #777);
+            box-shadow: 0 6px 20px rgba(100, 100, 100, 0.5);
+        }
+
+        button.active {
+            background: linear-gradient(135deg, #00cc00, #00ff00);
+            box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .channel-btn {
+            padding: 10px 15px;
+            font-size: 0.85em;
+            background: linear-gradient(135deg, #444, #666);
+            transition: all 0.2s ease;
+        }
+
+        .channel-btn:hover {
+            background: linear-gradient(135deg, #666, #888);
+        }
+
+        .channel-btn.selected {
+            background: linear-gradient(135deg, #00cc00, #00ff00);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            cursor: pointer;
+            background: linear-gradient(to right, #333 0%, #666 100%);
+            border-radius: 5px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #ff0000;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #ff0000;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            border: none;
+        }
+
+        .volume-display {
+            min-width: 50px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .info-panel {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #ff0000;
+        }
+
+        .info-panel h3 {
+            margin-bottom: 15px;
+            color: #ff0000;
+        }
+
+        .schedule-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .schedule-item {
+            padding: 10px;
+            border-bottom: 1px solid #444;
+            font-size: 0.9em;
+        }
+
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .time {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: rgba(0, 255, 0, 0.2);
+            border-left: 4px solid #00ff00;
+            color: #00ff00;
+            display: block;
+        }
+
+        .alert.error {
+            background: rgba(255, 0, 0, 0.2);
+            border-left: 4px solid #ff0000;
+            color: #ff0000;
+            display: block;
+        }
+
+        .alert.info {
+            background: rgba(0, 150, 255, 0.2);
+            border-left: 4px solid #0096ff;
+            color: #0096ff;
+            display: block;
+        }
+
+        footer {
+            text-align: center;
+            color: #888;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid #444;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .status-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .tv-container {
+                border-width: 10px;
+            }
+
+            .controls {
+                padding: 15px;
+            }
+
+            .channel-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📺 Canadian TV Simulator</h1>
+            <p class="subtitle">2011 Era • Web Streaming Version</p>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="power-indicator off" id="powerIndicator"></span>
+                    <span id="powerStatus">OFF</span>
+                </div>
+                <div class="status-item" id="channelStatus">Channel: --</div>
+                <div class="status-item" id="timeStatus">Time: --:--</div>
+                <div class="status-item" id="volumeStatus">Volume: 50%</div>
+            </div>
+        </header>
+
+        <div id="alertContainer"></div>
+
+        <!-- TV Screen -->
+        <div class="tv-container">
+            <div class="screen off" id="screen">
+                <div class="screen-content" id="screenContent">
+                    <div class="no-signal">⚫</div>
+                    <p>TV is OFF</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <!-- Power Control -->
+            <div class="control-group">
+                <label>🔴 Power</label>
+                <div class="button-group">
+                    <button id="powerBtn" onclick="togglePower()">Power ON/OFF</button>
+                </div>
+            </div>
+
+            <!-- Channel Control -->
+            <div class="control-group">
+                <label>📡 Channel</label>
+                <div id="channelButtons" class="channel-grid"></div>
+            </div>
+
+            <!-- Volume Control -->
+            <div class="control-group">
+                <label>🔊 Volume</label>
+                <div class="volume-control">
+                    <input type="range" id="volumeSlider" min="0" max="100" value="50" onchange="setVolume(this.value)">
+                    <span class="volume-display" id="volumeDisplay">50%</span>
+                </div>
+            </div>
+
+            <!-- Additional Controls -->
+            <div class="control-group">
+                <label>📋 Actions</label>
+                <div class="button-group">
+                    <button class="secondary" id="guideBtn" onclick="showGuide()">📺 TV Guide</button>
+                    <button class="secondary" id="refreshBtn" onclick="updateStatus()">🔄 Refresh</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Program Info -->
+        <div class="info-panel">
+            <h3>📺 Now Playing</h3>
+            <div id="programInfo">
+                <p>Turn on the TV to see what's playing</p>
+            </div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="info-panel">
+            <h3>📋 Today's Schedule</h3>
+            <div class="schedule-list" id="scheduleList">
+                <p>Turn on the TV to view schedule</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>🍁 Canadian TV Simulator 2011 Era • Web Streaming Server</p>
+            <p>Connected to: <span id="serverStatus">Connecting...</span></p>
+        </footer>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_URL = '/api';
+
+        // State
+        let tvState = {
+            isOn: false,
+            currentChannel: 'CBC',
+            volume: 50,
+            allChannels: []
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadChannels();
+            updateStatus();
+            setInterval(updateTime, 1000);
+            updateTime();
+            showAlert('Welcome to Canadian TV Simulator!', 'info');
+        });
+
+        // Toggle Power
+        async function togglePower() {
+            try {
+                const response = await fetch(`${API_URL}/power`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ power: !tvState.isOn })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    tvState.isOn = data.power;
+                    updateDisplay();
+                    showAlert(data.message, 'success');
+                }
+            } catch (error) {
+                showAlert('Error toggling power: ' + error.message, 'error');
+            }
+        }
+
+        // Change Channel
+        async function changeChannel(channelName) {
+            if (!tvState.isOn) {
+                showAlert('Turn on the TV first!', 'error');
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/channel`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channel: channelName })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    tvState.currentChannel = channelName;
+                    updateDisplay();
+                    updateStatus();
+                    showAlert(`Tuned to ${channelName}`, 'success');
+                }
+            } catch (error) {
+                showAlert('Error changing channel: ' + error.message, 'error');
+            }
+        }
+
+        // Set Volume
+        async function setVolume(value) {
+            tvState.volume = parseInt(value);
+            document.getElementById('volumeSlider').value = value;
+            document.getElementById('volumeDisplay').textContent = value + '%';
+            document.getElementById('volumeStatus').textContent = `Volume: ${value}%`;
+            
+            try {
+                await fetch(`${API_URL}/volume`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ volume: value })
+                });
+            } catch (error) {
+                console.error('Error setting volume:', error);
+            }
+        }
+
+        // Load Channels
+        async function loadChannels() {
+            try {
+                const response = await fetch(`${API_URL}/channels`);
+                const data = await response.json();
+                if (data.success) {
+                    tvState.allChannels = data.channels;
+                    renderChannelButtons();
+                }
+            } catch (error) {
+                showAlert('Error loading channels: ' + error.message, 'error');
+            }
+        }
+
+        // Render Channel Buttons
+        function renderChannelButtons() {
+            const container = document.getElementById('channelButtons');
+            container.innerHTML = '';
+            tvState.allChannels.forEach(channel => {
+                const btn = document.createElement('button');
+                btn.className = 'channel-btn' + (channel === tvState.currentChannel ? ' selected' : '');
+                btn.textContent = channel;
+                btn.onclick = () => changeChannel(channel);
+                container.appendChild(btn);
+            });
+        }
+
+        // Update Status
+        async function updateStatus() {
+            try {
+                const response = await fetch(`${API_URL}/status`);
+                const data = await response.json();
+                if (data.success) {
+                    tvState.isOn = data.power;
+                    tvState.currentChannel = data.channel;
+                    tvState.volume = data.volume;
+                    updateDisplay();
+                    updateProgramInfo(data);
+                    updateSchedule();
+                    document.getElementById('serverStatus').textContent = '✓ Connected';
+                    document.getElementById('serverStatus').style.color = '#00ff00';
+                }
+            } catch (error) {
+                document.getElementById('serverStatus').textContent = '✗ Disconnected';
+                document.getElementById('serverStatus').style.color = '#ff0000';
+            }
+        }
+
+        // Update Display
+        function updateDisplay() {
+            const screen = document.getElementById('screen');
+            const screenContent = document.getElementById('screenContent');
+            const powerIndicator = document.getElementById('powerIndicator');
+            const powerStatus = document.getElementById('powerStatus');
+            const channelStatus = document.getElementById('channelStatus');
+            const volumeSlider = document.getElementById('volumeSlider');
+
+            if (tvState.isOn) {
+                screen.classList.remove('off');
+                powerIndicator.classList.remove('off');
+                powerStatus.textContent = 'ON';
+                channelStatus.textContent = `Channel: ${tvState.currentChannel}`;
+                volumeSlider.value = tvState.volume;
+                document.getElementById('volumeDisplay').textContent = tvState.volume + '%';
+                document.getElementById('volumeStatus').textContent = `Volume: ${tvState.volume}%`;
+                
+                screenContent.innerHTML = `
+                    <div class="program-info">
+                        <div class="channel-name">${tvState.currentChannel}</div>
+                        <div style="margin-top: 10px;"><span class="loading"></span> Loading program...</div>
+                    </div>
+                `;
+            } else {
+                screen.classList.add('off');
+                powerIndicator.classList.add('off');
+                powerStatus.textContent = 'OFF';
+                channelStatus.textContent = 'Channel: --';
+                screenContent.innerHTML = `
+                    <div class="no-signal">⚫</div>
+                    <p>TV is OFF</p>
+                `;
+            }
+
+            renderChannelButtons();
+        }
+
+        // Update Program Info
+        async function updateProgramInfo(statusData) {
+            if (!tvState.isOn || !statusData.current_program) {
+                document.getElementById('programInfo').innerHTML = '<p>Turn on the TV to see what\'s playing</p>';
+                return;
+            }
+
+            const program = statusData.current_program;
+            const nextProgram = statusData.next_program;
+            
+            let html = `
+                <div class="program-details">
+                    <div class="program-name">${program.name}</div>
+                    <div><strong>Genre:</strong> ${program.genre}</div>
+                    <div><strong>Duration:</strong> ${program.duration} minutes</div>
+                    <div><strong>Time:</strong> ${new Date(program.start_time).toLocaleTimeString()} - ${new Date(program.end_time).toLocaleTimeString()}</div>
+            `;
+            
+            if (nextProgram) {
+                html += `
+                    <hr style="margin: 15px 0; border: 1px solid #444;">
+                    <h4 style="color: #ff0000; margin-bottom: 10px;">Coming Up Next:</h4>
+                    <div><strong>${nextProgram.name}</strong></div>
+                    <div>at ${new Date(nextProgram.start_time).toLocaleTimeString()}</div>
+                `;
+            }
+            html += '</div>';
+            
+            document.getElementById('programInfo').innerHTML = html;
+
+            // Update screen content
+            if (tvState.isOn) {
+                document.getElementById('screenContent').innerHTML = `
+                    <div class="program-info">
+                        <div class="channel-name">${tvState.currentChannel}</div>
+                        <div class="program-name">${program.name}</div>
+                        <div class="program-details">
+                            <div>${program.genre}</div>
+                            <div>${program.duration} min</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Update Schedule
+        async function updateSchedule() {
+            if (!tvState.isOn) {
+                document.getElementById('scheduleList').innerHTML = '<p>Turn on the TV to view schedule</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/schedule/${tvState.currentChannel}`);
+                const data = await response.json();
+                
+                if (data.success && data.programs.length > 0) {
+                    let html = '';
+                    data.programs.forEach(program => {
+                        const startTime = new Date(program.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        html += `
+                            <div class="schedule-item">
+                                <span class="time">${startTime}</span> - ${program.name}
+                                <br><small>${program.genre} • ${program.duration} min</small>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('scheduleList').innerHTML = html;
+                } else {
+                    document.getElementById('scheduleList').innerHTML = '<p>No programs available</p>';
+                }
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+            }
+        }
+
+        // Show Guide
+        async function showGuide() {
+            if (!tvState.isOn) {
+                showAlert('Turn on the TV first!', 'error');
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/guide`);
+                const data = await response.json();
+                showAlert('TV Guide loaded. See console for details.', 'info');
+                console.log('Complete TV Guide:', data.guide);
+            } catch (error) {
+                showAlert('Error loading guide: ' + error.message, 'error');
+            }
+        }
+
+        // Update Time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('timeStatus').textContent = `Time: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+
+        // Show Alert
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }, 3000);
+        }
+
+        // Auto-refresh status
+        setInterval(() => {
+            if (tvState.isOn) {
+                updateStatus();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
